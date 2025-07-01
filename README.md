@@ -1,15 +1,17 @@
 # Simple_calculator
+
 Terminal-Based C Calculator
 
 /Simple_calculator/
 ├── src/
-│   ├── main.c              # CLI loop, user interaction
-│   └── calculator.c        # Core math logic
+│ ├── main.c # CLI loop, user interaction
+│ ├── menu.c # menu codes logic
+│ └── calculator.c # Core math logic
 ├── include/
-│   └── calculator.h        # Function declarations
-├── test/
-│   └── test_calculator.c   # Unit tests (optional)
-├── Makefile                # Build script
-├── README.md               # Project overview
-├── LICENSE                 # MIT or as chosen
-
+│ ├── main.h # CLI loop, user interaction
+│ ├── menu.h # menu codes logic
+│ └── calculator.h # Core math logic
+├── Makefile # Build script
+├── README.md # Project overview
+├── LICENSE # MIT or as chosen
+└── .gitignore # Ignore files

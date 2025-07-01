@@ -1,18 +1,33 @@
+# Compiler and flags
 CC = gcc
-CFLAGS = -Iinclude -Wall -Wextra -pedantic
-SRC = src/main.c src/calculator.c
-OBJ = $(SRC:.c=.o)
-TARGET = calc
+CFLAGS = -Iinclude -Wall -Wextra -Werror -pedantic
 
-.PHONY: all clean
+# Source and object files
+SRC = src/main.c src/calculator.c src/menu.c
+OBJ = $(patsubst src/%.c, build/%.o, $(SRC))
+TARGET = build/calc
 
-all: $(TARGET)
+.PHONY: all clean run build
 
+# Default target: build + run
+all: run
+
+# Run the binary
+run: build
+	@./$(TARGET)
+
+# Build only
+build: $(TARGET)
+
+# Link the final executable
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) $^ -o $@
+	@$(CC) $(CFLAGS) $^ -o $@ -lm
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+# Compile .c to .o (ensure build dir exists)
+build/%.o: src/%.c
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -c $< -o $@
 
+# Clean everything
 clean:
-	rm -f src/*.o $(TARGET)
+	@rm -rf build

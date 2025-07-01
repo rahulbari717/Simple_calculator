@@ -1,60 +1,164 @@
+// ==========================================
+// FILE: calculator.h
+// ==========================================
+/**
+ * @file calculator.h
+ * @brief Calculator engine header - Core mathematical operations
+ * @details Defines the calculator engine interface providing high-precision
+ *          mathematical operations with comprehensive error handling.
+ *          Designed for reliability, accuracy, and maintainability.
+ * @author Rahul B.
+ * @date 2025-07-01
+ * @version 1.0.0
+ */
+
 #ifndef CALCULATOR_H
 #define CALCULATOR_H
 
 #include <stdbool.h>
+#include <math.h>
+#include <limits.h>
+// ==========================================
+// MARK: - Calculator Constants
+// ==========================================
 
-// Constants
-#define HISTORY_MAX 50
+/** Maximum precision for floating-point operations */
+#define CALC_PRECISION_EPSILON 1e-15
 
-// Result codes
+/** Maximum safe integer for modulus operations */
+#define CALC_MAX_SAFE_INTEGER INT_MAX
+
+/** Minimum safe integer for modulus operations */
+#define CALC_MIN_SAFE_INTEGER INT_MIN
+
+// ==========================================
+// MARK: - Calculator Types
+// ==========================================
+
+/** Calculator operation result codes */
 typedef enum {
-    CALC_SUCCESS = 0,
-    CALC_DIVISION_BY_ZERO,
-    CALC_DOMAIN_ERROR,
-    CALC_OVERFLOW,
-    CALC_UNDERFLOW,
-    CALC_INVALID_INPUT
+    CALC_SUCCESS = 0,               ///< Operation completed successfully
+    CALC_ERROR_DIVISION_BY_ZERO,    ///< Division by zero attempted
+    CALC_ERROR_DOMAIN,              ///< Invalid domain for operation
+    CALC_ERROR_OVERFLOW,            ///< Numeric overflow occurred
+    CALC_ERROR_UNDERFLOW,           ///< Numeric underflow occurred
+    CALC_ERROR_INVALID_INPUT,       ///< Invalid input provided
+    CALC_ERROR_INIT                 ///< Calculator initialization error
 } calc_result_t;
 
-// Input status
-typedef enum {
-    INPUT_SUCCESS = 0,
-    INPUT_ERROR
-} input_result_t;
+// ==========================================
+// MARK: - Function Prototypes
+// ==========================================
 
-// Initialization & cleanup
-calc_result_t calculator_init(void);
+/**
+ * @brief Initialize the calculator engine
+ * @details Prepares the calculator engine for operation, initializes
+ *          internal state, and validates the mathematical environment.
+ * @return CALC_SUCCESS on success, appropriate error code on failure
+ */
+calc_result_t calculator_initialize(void);
+
+/**
+ * @brief Clean up calculator resources
+ * @details Releases any resources allocated by the calculator engine
+ *          and prepares for termination.
+ */
 void calculator_cleanup(void);
 
-// Basic operations
-calc_result_t calculate_add(double a, double b, double *res);
-calc_result_t calculate_subtract(double a, double b, double *res);
-calc_result_t calculate_multiply(double a, double b, double *res);
-calc_result_t calculate_divide(double a, double b, double *res);
+/**
+ * @brief Perform addition operation
+ * @details Computes the sum of two numbers with overflow detection.
+ * @param a First operand
+ * @param b Second operand
+ * @param result Pointer to store the result
+ * @return CALC_SUCCESS on success, error code on failure
+ * @pre result must not be NULL
+ * @post result contains a + b if CALC_SUCCESS returned
+ */
+calc_result_t calculator_add(double a, double b, double *result);
 
-// Advanced operations
-calc_result_t calculate_power(double a, double b, double *res);
-calc_result_t calculate_sqrt(double a, double *res);
-calc_result_t calculate_log(double a, double *res);
-calc_result_t calculate_sin(double a, double *res);
-calc_result_t calculate_cos(double a, double *res);
-calc_result_t calculate_tan(double a, double *res);
+/**
+ * @brief Perform subtraction operation
+ * @details Computes the difference of two numbers with overflow detection.
+ * @param a Minuend (number to subtract from)
+ * @param b Subtrahend (number to subtract)
+ * @param result Pointer to store the result
+ * @return CALC_SUCCESS on success, error code on failure
+ * @pre result must not be NULL
+ * @post result contains a - b if CALC_SUCCESS returned
+ */
+calc_result_t calculator_subtract(double a, double b, double *result);
 
-// History storage & display
-void add_to_history(double a, double b, double res, int op);
-void add_advanced_to_history(double a, double b, double res, int op);
-void display_calculation_history(void);
+/**
+ * @brief Perform multiplication operation
+ * @details Computes the product of two numbers with overflow detection.
+ * @param a First factor
+ * @param b Second factor
+ * @param result Pointer to store the result
+ * @return CALC_SUCCESS on success, error code on failure
+ * @pre result must not be NULL
+ * @post result contains a * b if CALC_SUCCESS returned
+ */
+calc_result_t calculator_multiply(double a, double b, double *result);
 
-// Error handling & helpers
-void handle_calculation_error(calc_result_t err);
-input_result_t get_double_input(const char *prompt, double *value);
+/**
+ * @brief Perform division operation
+ * @details Computes the quotient of two numbers with division-by-zero checking.
+ * @param a Dividend (number to be divided)
+ * @param b Divisor (number to divide by)
+ * @param result Pointer to store the result
+ * @return CALC_SUCCESS on success, error code on failure
+ * @pre result must not be NULL
+ * @post result contains a / b if CALC_SUCCESS returned
+ */
+calc_result_t calculator_divide(double a, double b, double *result);
 
-// Main loop & menu functions
-int run_main_loop(void);
-void display_main_menu(void);
-input_result_t get_user_choice(int *choice);
-void handle_basic_operations(void);
-void handle_advanced_operations(void);
-void display_help(void);
+/**
+ * @brief Perform modulus operation
+ * @details Computes the remainder of integer division with validation.
+ * @param a Dividend (integer to be divided)
+ * @param b Divisor (integer to divide by)
+ * @param result Pointer to store the result
+ * @return CALC_SUCCESS on success, error code on failure
+ * @pre result must not be NULL
+ * @post result contains a % b if CALC_SUCCESS returned
+ */
+calc_result_t calculator_modulus(int a, int b, double *result);
 
-#endif // CALCULATOR_H
+/**
+ * @brief Perform power operation
+ * @details Computes base raised to the power of exponent with domain validation.
+ * @param base Base number
+ * @param exponent Exponent value
+ * @param result Pointer to store the result
+ * @return CALC_SUCCESS on success, error code on failure
+ * @pre result must not be NULL
+ * @post result contains base^exponent if CALC_SUCCESS returned
+ */
+calc_result_t calculator_power(double base, double exponent, double *result);
+
+/**
+ * @brief Validate numeric input
+ * @details Checks if a number is finite and within acceptable ranges.
+ * @param value The number to validate
+ * @return true if valid, false otherwise
+ */
+bool calculator_is_valid_number(double value);
+
+/**
+ * @brief Check for numeric overflow
+ * @details Determines if a calculation result represents an overflow condition.
+ * @param value The value to check
+ * @return true if overflow detected, false otherwise
+ */
+bool calculator_is_overflow(double value);
+
+/**
+ * @brief Check for numeric underflow
+ * @details Determines if a calculation result represents an underflow condition.
+ * @param value The value to check
+ * @return true if underflow detected, false otherwise
+ */
+bool calculator_is_underflow(double value);
+
+#endif /* CALCULATOR_H */
